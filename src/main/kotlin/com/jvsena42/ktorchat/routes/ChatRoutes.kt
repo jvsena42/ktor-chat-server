@@ -4,6 +4,7 @@ import com.jvsena42.ktorchat.room.MemberAlreadyExistsException
 import com.jvsena42.ktorchat.room.RoomController
 import com.jvsena42.ktorchat.session.ChatSession
 import io.ktor.http.*
+import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
@@ -34,7 +35,6 @@ fun Route.chatSocket(roomController: RoomController) {
                     )
                 }
             }
-
         } catch (e: MemberAlreadyExistsException) {
             call.respond(HttpStatusCode.Conflict)
         } catch (e: Exception) {
@@ -42,7 +42,14 @@ fun Route.chatSocket(roomController: RoomController) {
         } finally {
             roomController.tryDisconnect(userName = session.userName)
         }
+    }
+}
 
-
+fun Route.getAllMessages(roomController: RoomController) {
+    get("/messages") {
+        call.respond(
+            HttpStatusCode.OK,
+            roomController.getAllMessages()
+        )
     }
 }
