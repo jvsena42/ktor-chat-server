@@ -42,4 +42,14 @@ class RoomController(
         }
     }
 
+    suspend fun getAllMessages(): List<Message> {
+        return messageDataSource.getAllMessages()
+    }
+
+    suspend fun tryDisconnect(userName: String) {
+        members[userName]?.run {
+            socket.close()
+            members.remove(userName)
+        }
+    }
 }
