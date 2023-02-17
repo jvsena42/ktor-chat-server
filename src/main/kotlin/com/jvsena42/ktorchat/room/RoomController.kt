@@ -3,6 +3,8 @@ package com.jvsena42.ktorchat.room
 import com.jvsena42.ktorchat.data.MessageDataSource
 import com.jvsena42.ktorchat.data.model.Message
 import io.ktor.websocket.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.util.concurrent.ConcurrentHashMap
 
 class RoomController(
@@ -27,7 +29,6 @@ class RoomController(
     }
 
     suspend fun sendMessage(senderUserName: String, message: String) {
-
         members.values.forEach { member ->
             val messageEntity = Message(
                 text = message,
@@ -35,8 +36,10 @@ class RoomController(
                 timeStamp = System.currentTimeMillis(),
             )
             messageDataSource.insertMessage(messageEntity)
-        }
 
+            val parsedMessage = Json.encodeToString(messageEntity)
+            member.socket.send(Frame.Text(parsedMessage))
+        }
     }
 
 }
